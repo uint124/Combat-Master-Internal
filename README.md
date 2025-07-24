@@ -1,4 +1,4 @@
-# Project Name
+# Combat Master Internal
 
 > *An internal cheat base for Combat Master with basic ESP and Aimbot.*
 
