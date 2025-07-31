@@ -46,10 +46,12 @@
 #include "Game/SDK/Camera.h"
 #include "Game/SDK/CameraController.h"
 #include "Game/SDK/PlayerMovement.h"
+#include "Game/SDK/PlayerHealth.h"
 #include "Game/SDK/PlayerRoot.h"
 
 #include "Utils/CombatMaster.h"
 #include "Utils/DebugLog.h"
+#include "Utils/InstanceFinder.h"
 
 #include "Render/GUI/Initialize.h"
 #include "Render/GUI/Style.h"

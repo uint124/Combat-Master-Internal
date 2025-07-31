@@ -158,6 +158,7 @@
     <ClInclude Include="Game\SDK\Il2cpp.h" />
     <ClInclude Include="Game\SDK\List.h" />
     <ClInclude Include="Game\SDK\Object.h" />
+    <ClInclude Include="Game\SDK\PlayerHealth.h" />
     <ClInclude Include="Game\SDK\PlayerMovement.h" />
     <ClInclude Include="Game\SDK\PlayerRoot.h" />
     <ClInclude Include="Game\SDK\Transform.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Utils\CalcAngle.h" />
     <ClInclude Include="Utils\CombatMaster.h" />
     <ClInclude Include="Utils\DebugLog.h" />
+    <ClInclude Include="Utils\InstanceFinder.h" />
     <ClInclude Include="Utils\Signature.h" />
   </ItemGroup>
   <ItemGroup>

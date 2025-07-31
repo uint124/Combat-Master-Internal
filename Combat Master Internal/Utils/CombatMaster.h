@@ -46,6 +46,12 @@ std::vector<PlayerRoot*> GetEntities()
         if (entity == localPlayer)
             continue;
 
+        if (entity->IsTeammate())
+            continue;
+
+        if (entity->IsDead())
+            continue;
+
         //printf("Entity %i -> %llx\n", i, entity);
         out.push_back(entity);
     }
@@ -53,7 +59,7 @@ std::vector<PlayerRoot*> GetEntities()
     return out;
 }
 
-PlayerRoot* ClosestInFOV(float fov = 250.f)
+PlayerRoot* ClosestInFOV(float fov)
 {
     auto localPlayer = PlayerRoot::GetLocalPlayer();
     if (!localPlayer) return nullptr;

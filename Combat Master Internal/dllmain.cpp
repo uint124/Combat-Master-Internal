@@ -8,8 +8,16 @@ void InitCheat()
     printf("[Project-V5.0] Injected!\n");
 
     Globals::Init();
+    
+    auto func = getFunc("UnityEngine.Physics::IgnoreCollision_Injected(System.IntPtr,System.IntPtr,System.Boolean)");
+    auto func2 = getFunc("UnityEngine.Transform::Internal_LookAt_Injected(System.IntPtr,UnityEngine.Vector3&,UnityEngine.Vector3&)");
+    printf("Function: %llx | gravity func: %llx\n", func, func2);
 
+
+    // Physics Manager 1F09258
     PatchAntiDebug();
+
+    //FindPlayerRootReferences();
 
     GUI::HookPresent();
 }

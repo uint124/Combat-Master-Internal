@@ -117,11 +117,29 @@
     <ClInclude Include="Utils\DebugLog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Utils\InstanceFinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\SDK\PlayerHealth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
     <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
     <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
     <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />

@@ -20,7 +20,15 @@ public:
 		return *(List<PlayerRoot>**)(GetInstance() + Offsets::PlayerRoot::allPlayers);
 	}
 
-	Transform* GetTransform()
+	Vector3 GetNeckPosition()
+	{
+		Transform* neckTransform = *(Transform**)((DWORD64)this + 0x30);
+		if (!neckTransform) return {};
+
+		return neckTransform->get_PositionInjected();
+	}
+
+	Transform* GetNeckTransform()
 	{
 		return *(Transform**)((DWORD64)this + 0x30);
 	}
@@ -30,6 +38,35 @@ public:
 		return *(PlayerMovement**)((DWORD64)this + 0xB0);
 	}
 
+	int GetTeamId()
+	{
+		using Fn = int(__fastcall*)(PlayerRoot* playerRoot);
+		return reinterpret_cast<Fn>(ProjectModule + 0x3B39460)(this);
+	}
+
+	bool IsTeammate()
+	{
+		PlayerRoot* localPlayer = PlayerRoot::GetLocalPlayer();
+		if (!localPlayer) return false;
+
+		return this->GetTeamId() == localPlayer->GetTeamId();
+	}
+
+	PlayerHealth* GetPlayerHealth()
+	{
+		return *(PlayerHealth**)((DWORD64)this + 0xB8);
+	}
+
+
+	bool IsDead()
+	{
+		// True for invalid pointers!?
+		PlayerHealth* playerHealth = GetPlayerHealth();
+		if (!playerHealth) return true;
+
+		return playerHealth->GetHealthPercent() <= 0.0000f;
+	}
+
 	CameraController* GetCameraController()
 	{
 		return *(CameraController**)((DWORD64)this + 0x48);
@@ -37,7 +74,7 @@ public:
 
 	Vector3 GetRootPosition()
 	{
-		auto transform = this->GetTransform();
+		auto transform = this->GetNeckTransform();
 
 		if (!transform) return {};
 

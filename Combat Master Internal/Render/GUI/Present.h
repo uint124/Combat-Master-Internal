@@ -81,7 +81,9 @@ namespace GUI
         ImDrawList* BackgroundDrawList = ImGui::GetBackgroundDrawList();
         ImDrawList* ForegroundDrawList = ImGui::GetForegroundDrawList();
 
-        BackgroundDrawList->AddCircle(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), 250.f, IM_COL32(255, 255, 255, 255), 100, 1.5f);
+        if (Menu::bDrawFov) {
+            BackgroundDrawList->AddCircle(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), Menu::aimbotFov, IM_COL32(255, 255, 255, 255), 100, 1.5f);
+        }
 
         if (GetAsyncKeyState(VK_INSERT) & 1) {
             Menu::bIsOpen = !Menu::bIsOpen;
@@ -109,8 +111,12 @@ namespace GUI
             if (Menu::currentPage == 0)
             {
                 ImGui::Checkbox("ESP (Generic)", &Menu::bEsp);
-                ImGui::Checkbox("Aimbot", &Menu::bAimbot);
                 ImGui::Checkbox("Break AI's (Host Only)", &Menu::bBreakAi);
+
+                ImGui::Checkbox("Aimbot", &Menu::bAimbot);
+                ImGui::Checkbox("Draw FOV", &Menu::bDrawFov);
+                ImGui::SliderFloat("Aim FOV", &Menu::aimbotFov, 1.f, 850.f, "%.0f");
+                ImGui::SliderFloat("Aim Smooth", &Menu::aimbotSmoothing, 5.f, 20.f, "%.3f");
             }
 
             else if (Menu::currentPage == 1)
@@ -131,17 +137,30 @@ namespace GUI
             Camera* localCamera = localPlayer->GetCamera();
             if (localCamera)
             {
+                // shi
+                //printf("local camera: %llx | local transform: %llx\n", localCamera, localPlayer->GetNeckTransform());
+
                 ViewMatrix viewMatrix = localCamera->GetViewMatrix();
 
-                PlayerRoot* closestPlayer = ClosestInFOV(250.f);
+                PlayerRoot* closestPlayer = ClosestInFOV(Menu::aimbotFov);
 
                 std::vector<PlayerRoot*> entities = GetEntities();
                 for (auto& entity : entities)
                 {
+                    PlayerHealth* playerHealth = entity->GetPlayerHealth();
+                    if (!playerHealth) continue;
+
+                    float healthPercent = playerHealth->GetHealthPercent();
+
+                    Vector3 neckPosition = entity->GetNeckPosition();
                     Vector3 rootPosition = entity->GetRootPosition();
 
                     Vector2 outPos;
-                    if (!WorldToScreen(rootPosition, &outPos, viewMatrix))
+                    if (!WorldToScreen(neckPosition, &outPos, viewMatrix))
+                        continue;
+
+                    Vector2 outPos2;
+                    if (!WorldToScreen(rootPosition, &outPos2, viewMatrix))
                         continue;
 
                     if (Menu::bBreakAi)
@@ -149,20 +168,31 @@ namespace GUI
                         entity->BreakAIBrain();
                     }
 
-                    float distance = Vector3::Distance(localPlayer->GetRootPosition(), rootPosition);
+                    float distance = Vector3::Distance(localPlayer->GetRootPosition(), neckPosition);
 
-                    char buffer[28];
-                    snprintf(buffer, sizeof(buffer), "PlayerRoot [%im]\n", static_cast<int>(distance));
+                    ImVec2 headW2s = ImVec2(outPos.x, outPos.y);
+                    ImVec2 rootW2s = ImVec2(outPos2.x, outPos2.y);
+
+                    float height = rootW2s.y - headW2s.y;
+                    float width = height / 2.0f;
+
+                    ImVec2 boxTopLeft = ImVec2(headW2s.x - width / 2.0f, headW2s.y);
+                    ImVec2 boxBottomRight = ImVec2(headW2s.x + width / 2.0f, rootW2s.y);
+
+
+                    char buffer[38];
+                    snprintf(buffer, sizeof(buffer), "PlayerRoot [%im] | %.5f\n", static_cast<int>(distance), healthPercent);
                     BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), IM_COL32(200, 0, 0, 255));
                     BackgroundDrawList->AddText(ImVec2(outPos.x, outPos.y), IM_COL32(255, 0, 0, 255), buffer);
+                    BackgroundDrawList->AddRect(boxTopLeft, boxBottomRight, IM_COL32(255, 0, 0, 255), 0.0f, 0, 1.5f); 
                 }
 
                 if (closestPlayer)
                 {
-                    Vector3 position = closestPlayer->GetRootPosition();
+                    Vector3 neckPosition = closestPlayer->GetNeckPosition();
 
                     Vector2 outPos;
-                    if (WorldToScreen(position, &outPos, viewMatrix))
+                    if (WorldToScreen(neckPosition, &outPos, viewMatrix))
                     {
                         BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), IM_COL32(0, 255, 255, 255), 2.f);
 
@@ -170,9 +200,9 @@ namespace GUI
                         {
                             // If player isn't aiming down sights then increase aimbot sensitivity
                             // to prevent erratic movements
-                            float smoothing = 20.f;
-                            double posx = (outPos.x - Screen::ScreenCenter.x) / smoothing;
-                            double posy = (outPos.y - Screen::ScreenCenter.y) / smoothing;
+
+                            double posx = (outPos.x - Screen::ScreenCenter.x) / Menu::aimbotSmoothing;
+                            double posy = (outPos.y - Screen::ScreenCenter.y) / Menu::aimbotSmoothing;
 
                             mouse_event(MOUSEEVENTF_MOVE, posx, posy, 0, 0);
                         }

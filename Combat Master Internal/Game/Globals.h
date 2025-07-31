@@ -28,6 +28,9 @@ namespace Globals
 
 		bool bEsp = true;
 		bool bAimbot = true;
+		bool bDrawFov = true;
+		float aimbotFov = 500.f;
+		float aimbotSmoothing = 10.f;
 
 		bool bBreakAi = false;
 

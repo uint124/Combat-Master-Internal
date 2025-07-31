@@ -24,6 +24,10 @@ namespace Offsets
 		constexpr uint64_t playerHealth = 0xB8;
 		constexpr uint64_t playerAI = 0xC8;
 
+		// Functions
+		constexpr uint64_t getHealthPercent = 0x3c820c0; // 12
+		constexpr uint64_t getTeamId = 0x3b39460; // 6
+
 	}
 
 	namespace PlayerAI

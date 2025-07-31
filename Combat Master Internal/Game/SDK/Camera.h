@@ -19,6 +19,14 @@ public:
 		return *(Vector3*)((DWORD64)cachedPtr + 0x444);
 	}
 
+	float GetFov()
+	{
+		uint64_t* cachedPtr = GetCachedPtr();
+		if (!cachedPtr) return 0;
+
+		return *(float*)(cachedPtr + 0x170);
+	}
+
 	static void SetFov(__int64 camera, float Fov)
 	{
 		using Fn = void(__fastcall*)(__int64 camera, float fov);
