@@ -34,6 +34,15 @@ namespace Globals
 
 		bool bBreakAi = false;
 
+		bool bEspBoxes = true;
+		bool bEspFilledBoxes = false;
+		bool bEspLines = false;
+		bool bEspNames = true;
+		bool bEspHealth = true;
+		bool bEspHealthBar = true;
+		bool bEspDistance = true;
+
+		float espMaxDistance = 200.0f;
 	}
 
 	void Init()

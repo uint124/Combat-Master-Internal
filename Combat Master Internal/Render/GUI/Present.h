@@ -42,6 +42,33 @@ bool RaycastFunc(int* physicsScene, Ray* ray, float maxDistance, int layerMask, 
     return retval;
 }
 
+ImU32 GetHealthColor(float healthPercent)
+{
+    if (healthPercent > 0.75f) return IM_COL32(0, 255, 0, 255);      // Green
+    else if (healthPercent > 0.50f) return IM_COL32(255, 255, 0, 255); // Yellow
+    else if (healthPercent > 0.25f) return IM_COL32(255, 165, 0, 255); // Orange
+    else return IM_COL32(255, 0, 0, 255);                              // Red
+}
+
+ImU32 GetDistanceColor(float distance)
+{
+    if (distance < 25.0f) return IM_COL32(255, 0, 0, 255);        // Close - Red
+    else if (distance < 50.0f) return IM_COL32(255, 165, 0, 255); // Medium - Orange
+    else if (distance < 100.0f) return IM_COL32(255, 255, 0, 255); // Far - Yellow
+    else return IM_COL32(255, 255, 255, 255);                     // Very Far - White
+}
+
+void DrawHealthBar(ImDrawList* drawList, ImVec2 position, float width, float height, float healthPercent)
+{
+    drawList->AddRectFilled(position, ImVec2(position.x + width, position.y + height), IM_COL32(0, 0, 0, 150));
+
+    float healthWidth = width * healthPercent;
+    ImU32 healthColor = GetHealthColor(healthPercent);
+    drawList->AddRectFilled(position, ImVec2(position.x + healthWidth, position.y + height), healthColor);
+
+    drawList->AddRect(position, ImVec2(position.x + width, position.y + height), IM_COL32(255, 255, 255, 255), 0.0f, 0, 1.0f);
+}
+
 namespace GUI
 {
     bool init = false;
@@ -97,7 +124,7 @@ namespace GUI
 
         if (Menu::bIsOpen)
         {
-            ImGui::SetNextWindowSize(ImVec2(500, 300));
+            ImGui::SetNextWindowSize(ImVec2(600, 450));
             ImGui::Begin("Combat Master Internal", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
             if (ImGui::Button("Cheat", ImVec2(100, 20)))
@@ -105,12 +132,20 @@ namespace GUI
 
             ImGui::SameLine(110);
 
-            if (ImGui::Button("Settings", ImVec2(100, 20)))
+            if (ImGui::Button("ESP", ImVec2(100, 20)))
                 Menu::currentPage = 1;
+
+            ImGui::SameLine(220);
+
+            if (ImGui::Button("Settings", ImVec2(100, 20)))
+                Menu::currentPage = 2;
 
             if (Menu::currentPage == 0)
             {
-                ImGui::Checkbox("ESP (Generic)", &Menu::bEsp);
+                ImGui::Separator();
+                ImGui::Text("Combat Features");
+                ImGui::Separator();
+
                 ImGui::Checkbox("Break AI's (Host Only)", &Menu::bBreakAi);
 
                 ImGui::Checkbox("Aimbot", &Menu::bAimbot);
@@ -121,6 +156,46 @@ namespace GUI
 
             else if (Menu::currentPage == 1)
             {
+                ImGui::Separator();
+                ImGui::Text("ESP Features");
+                ImGui::Separator();
+
+                // Basic ESP
+                ImGui::Checkbox("Enable ESP", &Menu::bEsp);
+
+                if (Menu::bEsp) {
+                    ImGui::Separator();
+                    ImGui::Text("Visual Options");
+                    ImGui::Separator();
+
+                    ImGui::Checkbox("Player Boxes", &Menu::bEspBoxes);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Filled Boxes", &Menu::bEspFilledBoxes);
+                    ImGui::Checkbox("Tracelines", &Menu::bEspLines);
+
+                    ImGui::Separator();
+                    ImGui::Text("Information");
+                    ImGui::Separator();
+
+                    ImGui::Checkbox("Player Names", &Menu::bEspNames);
+                    ImGui::Checkbox("Health", &Menu::bEspHealth);
+                    ImGui::Checkbox("Health Bar", &Menu::bEspHealthBar);
+                    ImGui::Checkbox("Distance", &Menu::bEspDistance);
+
+                    ImGui::Separator();
+                    ImGui::Text("Filtering");
+                    ImGui::Separator();
+
+                    ImGui::SliderFloat("Max Distance", &Menu::espMaxDistance, 10.f, 500.f, "%.0fm");
+                }
+            }
+
+            else if (Menu::currentPage == 2)
+            {
+                ImGui::Separator();
+                ImGui::Text("General Settings");
+                ImGui::Separator();
+
                 ImGui::Checkbox("Watermark", &Menu::bWatermark);
                 if (ImGui::Button("Log Debug Info"))
                     LogDebugInformation();
@@ -137,54 +212,94 @@ namespace GUI
             Camera* localCamera = localPlayer->GetCamera();
             if (localCamera)
             {
-                // shi
-                //printf("local camera: %llx | local transform: %llx\n", localCamera, localPlayer->GetNeckTransform());
-
                 ViewMatrix viewMatrix = localCamera->GetViewMatrix();
-
                 PlayerRoot* closestPlayer = ClosestInFOV(Menu::aimbotFov);
 
                 std::vector<PlayerRoot*> entities = GetEntities();
+
                 for (auto& entity : entities)
                 {
                     PlayerHealth* playerHealth = entity->GetPlayerHealth();
                     if (!playerHealth) continue;
 
-                    float healthPercent = playerHealth->GetHealthPercent();
+                    float healthPercent = playerHealth ? playerHealth->GetHealthPercent() : 0.0f;
+                    bool isDead = entity->IsDead();
+                    bool isTeammate = entity->IsTeammate();
 
                     Vector3 neckPosition = entity->GetNeckPosition();
                     Vector3 rootPosition = entity->GetRootPosition();
+                    float distance = Vector3::Distance(localPlayer->GetRootPosition(), neckPosition);
 
-                    Vector2 outPos;
-                    if (!WorldToScreen(neckPosition, &outPos, viewMatrix))
-                        continue;
+                    if (distance > Menu::espMaxDistance) continue;
 
-                    Vector2 outPos2;
-                    if (!WorldToScreen(rootPosition, &outPos2, viewMatrix))
-                        continue;
+                    Vector2 outPos, outPos2;
+                    if (!WorldToScreen(neckPosition, &outPos, viewMatrix)) continue;
+                    if (!WorldToScreen(rootPosition, &outPos2, viewMatrix)) continue;
 
                     if (Menu::bBreakAi)
                     {
                         entity->BreakAIBrain();
                     }
 
-                    float distance = Vector3::Distance(localPlayer->GetRootPosition(), neckPosition);
-
                     ImVec2 headW2s = ImVec2(outPos.x, outPos.y);
                     ImVec2 rootW2s = ImVec2(outPos2.x, outPos2.y);
-
                     float height = rootW2s.y - headW2s.y;
                     float width = height / 2.0f;
-
                     ImVec2 boxTopLeft = ImVec2(headW2s.x - width / 2.0f, headW2s.y);
                     ImVec2 boxBottomRight = ImVec2(headW2s.x + width / 2.0f, rootW2s.y);
 
+                    ImU32 mainColor = IM_COL32(255, 255, 255, 255);
+                    if (isTeammate) {
+                        mainColor = IM_COL32(0, 255, 0, 255);
+                    }
+                    else {
+                        mainColor = IM_COL32(255, 0, 0, 255);
+                    }
 
-                    char buffer[38];
-                    snprintf(buffer, sizeof(buffer), "PlayerRoot [%im] | %.5f\n", static_cast<int>(distance), healthPercent);
-                    BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), IM_COL32(200, 0, 0, 255));
-                    BackgroundDrawList->AddText(ImVec2(outPos.x, outPos.y), IM_COL32(255, 0, 0, 255), buffer);
-                    BackgroundDrawList->AddRect(boxTopLeft, boxBottomRight, IM_COL32(255, 0, 0, 255), 0.0f, 0, 1.5f); 
+                    if (Menu::bEsp)
+                    {
+                        if (Menu::bEspBoxes) {
+                            if (Menu::bEspFilledBoxes) {
+                                BackgroundDrawList->AddRectFilled(boxTopLeft, boxBottomRight, IM_COL32(mainColor & 0xFF, (mainColor >> 8) & 0xFF, (mainColor >> 16) & 0xFF, 50));
+                            }
+                            BackgroundDrawList->AddRect(boxTopLeft, boxBottomRight, mainColor, 0.0f, 0, 1.5f);
+                        }
+                        if (Menu::bEspLines) {
+                            BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), mainColor, 1.0f);
+                        }
+
+                        float textYOffset = 0.0f;
+                        const float textSpacing = 15.0f;
+
+                        if (Menu::bEspNames) {
+                            char nameBuffer[64];
+                            snprintf(nameBuffer, sizeof(nameBuffer), "Player_%llx", (uint64_t)entity);
+                            BackgroundDrawList->AddText(ImVec2(boxBottomRight.x + 5, boxTopLeft.y + textYOffset), mainColor, nameBuffer);
+                            textYOffset += textSpacing;
+                        }
+
+                        if (Menu::bEspHealth && playerHealth) {
+                            char healthBuffer[32];
+                            snprintf(healthBuffer, sizeof(healthBuffer), "HP: %.0f%%", healthPercent * 100.0f);
+                            BackgroundDrawList->AddText(ImVec2(boxBottomRight.x + 5, boxTopLeft.y + textYOffset), GetHealthColor(healthPercent), healthBuffer);
+                            textYOffset += textSpacing;
+                        }
+
+                        if (Menu::bEspHealthBar && playerHealth) {
+                            ImVec2 healthBarPos = ImVec2(boxTopLeft.x - 8, boxTopLeft.y);
+                            DrawHealthBar(BackgroundDrawList, healthBarPos, 4, height, healthPercent);
+                        }
+
+                        if (Menu::bEspDistance) {
+                            char distanceBuffer[32];
+                            snprintf(distanceBuffer, sizeof(distanceBuffer), "%.0fm", distance);
+                            BackgroundDrawList->AddText(ImVec2(boxBottomRight.x + 5, boxTopLeft.y + textYOffset), mainColor, distanceBuffer);
+                            textYOffset += textSpacing;
+                        }
+                        if (isTeammate) {
+                            BackgroundDrawList->AddText(ImVec2(boxBottomRight.x + 5, boxTopLeft.y + textYOffset), IM_COL32(0, 255, 0, 255), "TEAMMATE");
+                        }
+                    }
                 }
 
                 if (closestPlayer)
@@ -209,7 +324,6 @@ namespace GUI
                     }
                 }
             }
-
         }
 
         ImGui::Render();

@@ -146,6 +146,12 @@
     <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
     <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
     <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
+    <ClCompile Include="$(SolutionDir)Dependencies\IMGUI\*.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Detours\detours.lib" />
