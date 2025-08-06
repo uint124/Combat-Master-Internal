@@ -33,7 +33,18 @@ namespace Globals
 		float aimbotSmoothing = 10.f;
 
 		bool bBreakAi = false;
+		bool bInfiniteJump = false;
 
+		bool bEspBoxes = true;
+		bool bEspFilledBoxes = false;
+		bool bEspLines = false;
+		bool bEspNames = true;
+		bool bEspHealth = true;
+		bool bEspHealthBar = true;
+		bool bEspDistance = true;
+		bool bShowAimbotTarget = false;
+
+		float espMaxDistance = 200.0f;
 	}
 
 	void Init()
