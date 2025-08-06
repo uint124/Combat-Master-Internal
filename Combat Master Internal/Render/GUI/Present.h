@@ -144,6 +144,8 @@ namespace GUI
                 ImGui::Separator();
                 ImGui::Text("Combat Features");
                 ImGui::Separator();
+
+                ImGui::Checkbox("Break AI's (Host Only)", &Menu::bBreakAi);
                 ImGui::Checkbox("Infinite Jump", &Menu::bInfiniteJump);
 
                 ImGui::Checkbox("Aimbot", &Menu::bAimbot);
