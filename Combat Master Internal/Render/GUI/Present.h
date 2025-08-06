@@ -18,7 +18,6 @@ __int64 GetDefaultPhysicsScene()
 
     return retval;
 }
-
 class Ray
 {
 public:
@@ -145,8 +144,7 @@ namespace GUI
                 ImGui::Separator();
                 ImGui::Text("Combat Features");
                 ImGui::Separator();
-
-                ImGui::Checkbox("Break AI's (Host Only)", &Menu::bBreakAi);
+                ImGui::Checkbox("Infinite Jump", &Menu::bInfiniteJump);
 
                 ImGui::Checkbox("Aimbot", &Menu::bAimbot);
                 ImGui::Checkbox("Draw FOV", &Menu::bDrawFov);
@@ -210,6 +208,14 @@ namespace GUI
 
         if (localPlayer)
         {
+            if (Menu::bInfiniteJump) {
+                PlayerMovement* movement = localPlayer->GetPlayerMovement();
+                if (movement) 
+                {
+                    *(bool*)((DWORD64)movement + 0x94) = false; // isInAir
+                    *(bool*)((DWORD64)movement + 0x96) = false; // isFalling
+                }
+            }
             Camera* localCamera = localPlayer->GetCamera();
             if (localCamera)
             {

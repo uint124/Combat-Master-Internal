@@ -33,6 +33,7 @@ namespace Globals
 		float aimbotSmoothing = 10.f;
 
 		bool bBreakAi = false;
+		bool bInfiniteJump = false;
 
 		bool bEspBoxes = true;
 		bool bEspFilledBoxes = false;
