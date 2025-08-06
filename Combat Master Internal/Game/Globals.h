@@ -41,6 +41,7 @@ namespace Globals
 		bool bEspHealth = true;
 		bool bEspHealthBar = true;
 		bool bEspDistance = true;
+		bool bShowAimbotTarget = false;
 
 		float espMaxDistance = 200.0f;
 	}

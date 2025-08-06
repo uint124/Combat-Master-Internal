@@ -172,6 +172,7 @@ namespace GUI
                     ImGui::SameLine();
                     ImGui::Checkbox("Filled Boxes", &Menu::bEspFilledBoxes);
                     ImGui::Checkbox("Tracelines", &Menu::bEspLines);
+                    ImGui::Checkbox("Show Aimbot Target", &Menu::bShowAimbotTarget);
 
                     ImGui::Separator();
                     ImGui::Text("Information");
@@ -309,8 +310,9 @@ namespace GUI
                     Vector2 outPos;
                     if (WorldToScreen(neckPosition, &outPos, viewMatrix))
                     {
-                        BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), IM_COL32(0, 255, 255, 255), 2.f);
-
+                        if (Menu::bShowAimbotTarget) {
+                            BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), IM_COL32(0, 255, 255, 255), 2.f);
+                        }
                         if (GetAsyncKeyState(VK_RBUTTON))
                         {
                             // If player isn't aiming down sights then increase aimbot sensitivity
