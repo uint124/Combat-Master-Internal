@@ -123,83 +123,216 @@ namespace GUI
 
         if (Menu::bIsOpen)
         {
-            ImGui::SetNextWindowSize(ImVec2(600, 450));
+            ImGui::SetNextWindowSize(ImVec2(750, 550));
             ImGui::Begin("Combat Master Internal", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-            if (ImGui::Button("Cheat", ImVec2(100, 20)))
-                Menu::currentPage = 0;
-
-            ImGui::SameLine(110);
-
-            if (ImGui::Button("ESP", ImVec2(100, 20)))
-                Menu::currentPage = 1;
-
-            ImGui::SameLine(220);
-
-            if (ImGui::Button("Settings", ImVec2(100, 20)))
-                Menu::currentPage = 2;
+            // Modern tab-style navigation with better spacing
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(20, 10));
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 0));
+            
+            // Tab buttons with modern styling
+            ImVec2 tabSize = ImVec2(140, 35);
+            
+            // Combat tab
+            if (Menu::currentPage == 0) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.00f, 0.70f, 0.70f, 0.8f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.00f, 0.80f, 0.80f, 0.9f));
+                if (ImGui::Button("Combat", tabSize))
+                    Menu::currentPage = 0;
+                ImGui::PopStyleColor(2);
+            } else {
+                if (ImGui::Button("Combat", tabSize))
+                    Menu::currentPage = 0;
+            }
+            
+            ImGui::SameLine();
+            
+            // ESP tab
+            if (Menu::currentPage == 1) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.00f, 0.70f, 0.70f, 0.8f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.00f, 0.80f, 0.80f, 0.9f));
+                if (ImGui::Button("ESP", tabSize))
+                    Menu::currentPage = 1;
+                ImGui::PopStyleColor(2);
+            } else {
+                if (ImGui::Button("ESP", tabSize))
+                    Menu::currentPage = 1;
+            }
+            
+            ImGui::SameLine();
+            
+            // Settings tab
+            if (Menu::currentPage == 2) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.00f, 0.70f, 0.70f, 0.8f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.00f, 0.80f, 0.80f, 0.9f));
+                if (ImGui::Button("Settings", tabSize))
+                    Menu::currentPage = 2;
+                ImGui::PopStyleColor(2);
+            } else {
+                if (ImGui::Button("Settings", tabSize))
+                    Menu::currentPage = 2;
+            }
+            
+            ImGui::PopStyleVar(2);
+            
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
 
             if (Menu::currentPage == 0)
             {
+                // Combat Features with modern layout
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+                
+                // Aimbot Section
+                ImGui::BeginChild("AimbotSection", ImVec2(0, 200), true);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                ImGui::Text("Aimbot Configuration");
+                ImGui::PopStyleColor();
                 ImGui::Separator();
-                ImGui::Text("Combat Features");
+                ImGui::Spacing();
+                
+                ImGui::Checkbox("Enable Aimbot", &Menu::bAimbot);
+                ImGui::Spacing();
+                
+                if (Menu::bAimbot) {
+                    ImGui::Indent(20.0f);
+                    ImGui::SliderFloat("FOV Range", &Menu::aimbotFov, 1.f, 850.f, "%.0f°");
+                    ImGui::SliderFloat("Smoothing", &Menu::aimbotSmoothing, 5.f, 20.f, "%.3f");
+                    ImGui::Checkbox("Draw FOV Circle", &Menu::bDrawFov);
+                    ImGui::Unindent(20.0f);
+                }
+                ImGui::EndChild();
+                
+                ImGui::Spacing();
+                
+                // Movement & Misc Section
+                ImGui::BeginChild("MovementSection", ImVec2(0, 150), true);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                ImGui::Text("Movement & Misc");
+                ImGui::PopStyleColor();
                 ImGui::Separator();
-
-                ImGui::Checkbox("Break AI's (Host Only)", &Menu::bBreakAi);
+                ImGui::Spacing();
+                
                 ImGui::Checkbox("Infinite Jump", &Menu::bInfiniteJump);
-
-                ImGui::Checkbox("Aimbot", &Menu::bAimbot);
-                ImGui::Checkbox("Draw FOV", &Menu::bDrawFov);
-                ImGui::SliderFloat("Aim FOV", &Menu::aimbotFov, 1.f, 850.f, "%.0f");
-                ImGui::SliderFloat("Aim Smooth", &Menu::aimbotSmoothing, 5.f, 20.f, "%.3f");
+                ImGui::Checkbox("Break AI's (Host Only)", &Menu::bBreakAi);
+                
+                ImGui::EndChild();
+                
+                ImGui::PopStyleVar(2);
             }
 
             else if (Menu::currentPage == 1)
             {
+                // ESP Features with modern layout
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+                
+                // Main ESP Toggle
+                ImGui::BeginChild("ESPMainSection", ImVec2(0, 80), true);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                ImGui::Text("ESP Master Control");
+                ImGui::PopStyleColor();
                 ImGui::Separator();
-                ImGui::Text("ESP Features");
-                ImGui::Separator();
-
-                // Basic ESP
+                ImGui::Spacing();
+                
                 ImGui::Checkbox("Enable ESP", &Menu::bEsp);
-
+                ImGui::EndChild();
+                
+                ImGui::Spacing();
+                
                 if (Menu::bEsp) {
+                    // Visual Elements Section
+                    ImGui::BeginChild("ESPVisualSection", ImVec2(0, 180), true);
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                    ImGui::Text("Visual Elements");
+                    ImGui::PopStyleColor();
                     ImGui::Separator();
-                    ImGui::Text("Visual Options");
-                    ImGui::Separator();
-
-                    ImGui::Checkbox("Player Boxes", &Menu::bEspBoxes);
-                    ImGui::SameLine();
+                    ImGui::Spacing();
+                    
+                    ImGui::Columns(2, "ESPColumns", false);
+                    
+                    ImGui::Checkbox("Boxes", &Menu::bEspBoxes);
                     ImGui::Checkbox("Filled Boxes", &Menu::bEspFilledBoxes);
-                    ImGui::Checkbox("Tracelines", &Menu::bEspLines);
+                    ImGui::Checkbox("Snap Lines", &Menu::bEspLines);
                     ImGui::Checkbox("Show Aimbot Target", &Menu::bShowAimbotTarget);
-
-                    ImGui::Separator();
-                    ImGui::Text("Information");
-                    ImGui::Separator();
-
+                    
+                    ImGui::NextColumn();
+                    
                     ImGui::Checkbox("Player Names", &Menu::bEspNames);
-                    ImGui::Checkbox("Health", &Menu::bEspHealth);
-                    ImGui::Checkbox("Health Bar", &Menu::bEspHealthBar);
-                    ImGui::Checkbox("Distance", &Menu::bEspDistance);
-
+                    ImGui::Checkbox("Health Text", &Menu::bEspHealth);
+                    ImGui::Checkbox("Health Bars", &Menu::bEspHealthBar);
+                    ImGui::Checkbox("Distance Info", &Menu::bEspDistance);
+                    
+                    ImGui::Columns(1);
+                    
+                    ImGui::EndChild();
+                    
+                    ImGui::Spacing();
+                    
+                    // ESP Settings Section
+                    ImGui::BeginChild("ESPSettingsSection", ImVec2(0, 100), true);
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                    ImGui::Text("ESP Settings");
+                    ImGui::PopStyleColor();
                     ImGui::Separator();
-                    ImGui::Text("Filtering");
-                    ImGui::Separator();
-
+                    ImGui::Spacing();
+                    
                     ImGui::SliderFloat("Max Distance", &Menu::espMaxDistance, 10.f, 500.f, "%.0fm");
+                    
+                    ImGui::EndChild();
                 }
+                
+                ImGui::PopStyleVar(2);
             }
 
             else if (Menu::currentPage == 2)
             {
+                // Settings with modern layout
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+                
+                // UI Settings Section
+                ImGui::BeginChild("UISettingsSection", ImVec2(0, 120), true);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                ImGui::Text("Interface Settings");
+                ImGui::PopStyleColor();
                 ImGui::Separator();
-                ImGui::Text("General Settings");
+                ImGui::Spacing();
+                
+                ImGui::Checkbox("Show Watermark", &Menu::bWatermark);
+                
+                ImGui::Spacing();
+                ImGui::Text("Menu Toggle: INSERT key");
+                
+                ImGui::EndChild();
+                
+                ImGui::Spacing();
+                
+                // Information Section
+                ImGui::BeginChild("InfoSection", ImVec2(0, 200), true);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.8f, 0.8f, 1.0f));
+                ImGui::Text("Information");
+                ImGui::PopStyleColor();
                 ImGui::Separator();
-
-                ImGui::Checkbox("Watermark", &Menu::bWatermark);
-                if (ImGui::Button("Log Debug Info"))
-                    LogDebugInformation();
+                ImGui::Spacing();
+                
+                ImGui::Text("Combat Master Internal");
+                ImGui::Text("Version: 1.0");
+                ImGui::Spacing();
+                
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+                ImGui::TextWrapped("Features:");
+                ImGui::BulletText("Advanced Aimbot with FOV control");
+                ImGui::BulletText("Comprehensive ESP system");
+                ImGui::BulletText("Movement enhancements");
+                ImGui::BulletText("AI manipulation tools");
+                ImGui::PopStyleColor();
+                
+                ImGui::EndChild();
+                
+                ImGui::PopStyleVar(2);
             }
 
             ImGui::End();
