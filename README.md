@@ -54,3 +54,7 @@ TODO
 ![Gameplay Image 1](./assets/gameplay1.png)
 
 ![Gameplay Image 2](./assets/gameplay2.png)
+
+![Gameplay Image 3](./assets/gameplay3.png)
+
+![Gameplay Image 4](./assets/gameplay4.png)
