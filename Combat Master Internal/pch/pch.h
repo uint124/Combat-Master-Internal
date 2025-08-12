@@ -47,6 +47,7 @@
 #include "Game/SDK/PlayerMovement.h"
 #include "Game/SDK/PlayerHealth.h"
 #include "Game/SDK/PlayerRoot.h"
+#include "Game/SDK/Unlocker.h"
 
 #include "Utils/CombatMaster.h"
 #include "Utils/DebugLog.h"

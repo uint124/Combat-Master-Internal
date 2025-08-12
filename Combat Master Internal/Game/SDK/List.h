@@ -17,6 +17,6 @@ public:
 
 	int Size()
 	{
-		return *(int*)((DWORD64)this + Offsets::List::listSize);
+		return *(int*)((DWORD64)this + 0x18); // List size offset
 	}
 };

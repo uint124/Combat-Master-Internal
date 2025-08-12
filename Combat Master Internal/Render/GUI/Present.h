@@ -161,16 +161,30 @@ namespace GUI
             
             ImGui::SameLine();
             
-            // Settings tab
+            // Unlocker tab
             if (Menu::currentPage == 2) {
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.00f, 0.70f, 0.70f, 0.8f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.00f, 0.80f, 0.80f, 0.9f));
-                if (ImGui::Button("Settings", tabSize))
+                if (ImGui::Button("Unlocker", tabSize))
                     Menu::currentPage = 2;
                 ImGui::PopStyleColor(2);
             } else {
-                if (ImGui::Button("Settings", tabSize))
+                if (ImGui::Button("Unlocker", tabSize))
                     Menu::currentPage = 2;
+            }
+            
+            ImGui::SameLine();
+            
+            // Settings tab
+            if (Menu::currentPage == 3) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.00f, 0.70f, 0.70f, 0.8f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.00f, 0.80f, 0.80f, 0.9f));
+                if (ImGui::Button("Settings", tabSize))
+                    Menu::currentPage = 3;
+                ImGui::PopStyleColor(2);
+            } else {
+                if (ImGui::Button("Settings", tabSize))
+                    Menu::currentPage = 3;
             }
             
             ImGui::PopStyleVar(2);
@@ -201,6 +215,70 @@ namespace GUI
                     ImGui::SliderFloat("FOV Range", &Menu::aimbotFov, 1.f, 850.f, "%.0f°");
                     ImGui::SliderFloat("Smoothing", &Menu::aimbotSmoothing, 5.f, 20.f, "%.3f");
                     ImGui::Checkbox("Draw FOV Circle", &Menu::bDrawFov);
+                    
+                    ImGui::Spacing();
+                    ImGui::Text("Aimbot Key:");
+                    
+                    static bool isCapturingKey = false;
+                    
+                    const char* currentKeyName = "Right Mouse";
+                    switch (Globals::Menu::aimbotKey) {
+                        case VK_LBUTTON: currentKeyName = "Left Mouse"; break;
+                        case VK_RBUTTON: currentKeyName = "Right Mouse"; break;
+                        case VK_MBUTTON: currentKeyName = "Middle Mouse"; break;
+                        case VK_XBUTTON1: currentKeyName = "X1 Mouse"; break;
+                        case VK_XBUTTON2: currentKeyName = "X2 Mouse"; break;
+                        case VK_SPACE: currentKeyName = "Space"; break;
+                        case VK_SHIFT: currentKeyName = "Shift"; break;
+                        case VK_CONTROL: currentKeyName = "Ctrl"; break;
+                        case VK_MENU: currentKeyName = "Alt"; break;
+                        case VK_F1: currentKeyName = "F1"; break;
+                        case VK_F2: currentKeyName = "F2"; break;
+                        case VK_F3: currentKeyName = "F3"; break;
+                        case VK_F4: currentKeyName = "F4"; break;
+                        case VK_F5: currentKeyName = "F5"; break;
+                        case VK_F6: currentKeyName = "F6"; break;
+                        case VK_F7: currentKeyName = "F7"; break;
+                        case VK_F8: currentKeyName = "F8"; break;
+                        case VK_F9: currentKeyName = "F9"; break;
+                        case VK_F10: currentKeyName = "F10"; break;
+                        case VK_F11: currentKeyName = "F11"; break;
+                        case VK_F12: currentKeyName = "F12"; break;
+                        default:
+                            if (Globals::Menu::aimbotKey >= 0x41 && Globals::Menu::aimbotKey <= 0x5A) {
+                                static char letterName[2] = {0};
+                                letterName[0] = (char)Globals::Menu::aimbotKey;
+                                currentKeyName = letterName;
+                            } else {
+                                currentKeyName = "Unknown";
+                            }
+                            break;
+                    }
+                    
+                    if (isCapturingKey) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.8f));
+                        if (ImGui::Button("Press any key...", ImVec2(150, 25))) {
+                            isCapturingKey = false;
+                        }
+                        ImGui::PopStyleColor();
+                        
+                        for (int vk = 1; vk < 256; vk++) {
+                            if (vk == VK_INSERT) continue;
+                            if (GetAsyncKeyState(vk) & 0x8000) {
+                                Globals::Menu::aimbotKey = vk;
+                                isCapturingKey = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        if (ImGui::Button(currentKeyName, ImVec2(150, 25))) {
+                            isCapturingKey = true;
+                        }
+                    }
+                    
+                    ImGui::SameLine();
+                    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Click to change key");
+                    
                     ImGui::Unindent(20.0f);
                 }
                 ImGui::EndChild();
@@ -289,6 +367,19 @@ namespace GUI
 
             else if (Menu::currentPage == 2)
             {
+                if (ImGui::Button("Apply XP Boost", ImVec2(200, 40))) {
+                    Unlocker::XPBoost();
+                }
+                
+                ImGui::Spacing();
+                
+                if (ImGui::Button("Free All Bundles", ImVec2(200, 40))) {
+                    Unlocker::FreeBundles();
+                }
+            }
+
+            else if (Menu::currentPage == 3)
+            {
                 // Settings with modern layout
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 8.0f);
                 ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
@@ -328,6 +419,7 @@ namespace GUI
                 ImGui::BulletText("Comprehensive ESP system");
                 ImGui::BulletText("Movement enhancements");
                 ImGui::BulletText("AI manipulation tools");
+                ImGui::BulletText("Unlocker progression system");
                 ImGui::PopStyleColor();
                 
                 ImGui::EndChild();
@@ -454,7 +546,7 @@ namespace GUI
                         if (Menu::bShowAimbotTarget) {
                             BackgroundDrawList->AddLine(ImVec2(Screen::ScreenCenter.x, Screen::ScreenCenter.y), ImVec2(outPos.x, outPos.y), IM_COL32(0, 255, 255, 255), 2.f);
                         }
-                        if (GetAsyncKeyState(VK_RBUTTON))
+                        if (GetAsyncKeyState(Globals::Menu::aimbotKey))
                         {
                             // If player isn't aiming down sights then increase aimbot sensitivity
                             // to prevent erratic movements
