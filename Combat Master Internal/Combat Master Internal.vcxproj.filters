@@ -123,6 +123,9 @@
     <ClInclude Include="Game\SDK\PlayerHealth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Game\SDK\HUnlocker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

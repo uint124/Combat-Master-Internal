@@ -1,4 +1,5 @@
 #pragma once
+#include <Windows.h>
 
 namespace Globals
 {
@@ -31,6 +32,7 @@ namespace Globals
 		bool bDrawFov = true;
 		float aimbotFov = 500.f;
 		float aimbotSmoothing = 10.f;
+		int aimbotKey = VK_RBUTTON;
 
 		bool bBreakAi = false;
 		bool bInfiniteJump = false;

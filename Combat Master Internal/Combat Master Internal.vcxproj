@@ -155,6 +155,7 @@
     <ClInclude Include="Game\SDK\Camera.h" />
     <ClInclude Include="Game\SDK\CameraController.h" />
     <ClInclude Include="Game\SDK\GameObject.h" />
+    <ClInclude Include="Game\SDK\Unlocker.h" />
     <ClInclude Include="Game\SDK\Il2cpp.h" />
     <ClInclude Include="Game\SDK\List.h" />
     <ClInclude Include="Game\SDK\Object.h" />
