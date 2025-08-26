@@ -25,7 +25,11 @@
 // (Integer encoded as XYYZZ for use in #if preprocessor conditionals, e.g. '#if IMGUI_VERSION_NUM >= 12345')
 #define IMGUI_VERSION       "1.90.2"
 #define IMGUI_VERSION_NUM   19020
+
 #define IMGUI_HAS_TABLE
+#ifdef _DEBUG
+#define IMGUI_DEBUG_SUPPRESS_ASSERT
+#endif
 
 
 /*
@@ -55,8 +59,10 @@ Index of this file:
 // (edit imconfig.h or '#define IMGUI_USER_CONFIG "myfilename.h" from your build system)
 #ifdef IMGUI_USER_CONFIG
 #include IMGUI_USER_CONFIG
+
 #endif
-#include "imconfig.h"
+#define IMGUI_DEBUG_SUPPRESS_ASSERT  // Add before including imgui.h
+#include "imgui.h"
 
 #ifndef IMGUI_DISABLE
 
@@ -82,8 +88,11 @@ Index of this file:
 
 // Helper Macros
 #ifndef IM_ASSERT
-#include <assert.h>
-#define IM_ASSERT(_EXPR)            assert(_EXPR)                               // You can override the default assert handler by editing imconfig.h
+#ifdef IMGUI_DEBUG_SUPPRESS_ASSERT
+#define IM_ASSERT(condition)  ((void)0)
+#else
+#define IM_ASSERT(condition)  do { if (!(condition)) { IM_MSVC_RUNTIME_CHECKS_OFF __debugbreak(); } } while (0)
+#endif
 #endif
 #define IM_ARRAYSIZE(_ARR)          ((int)(sizeof(_ARR) / sizeof(*(_ARR))))     // Size of a static C-style array. Don't use on pointers!
 #define IM_UNUSED(_VAR)             ((void)(_VAR))                              // Used to silence "unused variable warnings". Often useful as asserts may be stripped out from final builds.
